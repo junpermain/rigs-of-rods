@@ -1,0 +1,37 @@
+name: Build Rigs of Rods
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: 'true'
+
+    - name: Set up dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential libbullet-dev liblua5.3-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libopenal-dev libvorbis-dev libogg-dev libpng-dev libjpeg-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev
+
+    - name: Build Rigs of Rods
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+        make -j$(nproc)
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: RigsOfRods-Build
+        path: build/
